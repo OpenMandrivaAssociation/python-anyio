@@ -1,6 +1,6 @@
 %define module anyio
 
-Summary:	Asynchronous concurrency and networking framework working on top of either trio or asyncio in python
+Summary:	High level compatibility layer for multiple asynchronous event loop implementations
 Name:		python-%{module}
 Version:	3.5.0
 Release:	1
@@ -11,6 +11,7 @@ Source:		https://files.pythonhosted.org/packages/source/a/%{module}/%{module}-%{
 
 BuildRequires:	pkgconfig(python3)
 BuildRequires:	python3dist(pip)
+BuildRequires:	python3dist(pytest)
 BuildRequires:	python3dist(setuptools)
 BuildRequires:	python3dist(setuptools-scm)
 BuildRequires:	python3dist(wheel)
