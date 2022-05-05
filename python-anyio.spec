@@ -12,6 +12,7 @@ Source:		https://files.pythonhosted.org/packages/source/a/%{module}/%{module}-%{
 BuildRequires:	pkgconfig(python3)
 BuildRequires:	python3dist(pip)
 BuildRequires:	python3dist(setuptools)
+BuildRequires:	python3dist(setuptools-scm)
 BuildRequires:	python3dist(wheel)
 
 BuildArch:	noarch
