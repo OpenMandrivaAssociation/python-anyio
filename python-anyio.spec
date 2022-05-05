@@ -10,6 +10,7 @@ Url:		https://github.com/agronholm/%{module}
 Source:		https://files.pythonhosted.org/packages/source/a/%{module}/%{module}-%{version}.tar.gz
 
 BuildRequires:	pkgconfig(python3)
+BuildRequires:	python3dist(pip)
 BuildRequires:	python3dist(setuptools)
 BuildRequires:	python3dist(wheel)
 
