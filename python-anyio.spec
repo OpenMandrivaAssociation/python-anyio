@@ -14,6 +14,7 @@ BuildRequires:	python3dist(pip)
 BuildRequires:	python3dist(pytest)
 BuildRequires:	python3dist(setuptools)
 BuildRequires:	python3dist(setuptools-scm)
+BuildRequires:  python3dist(tomli)
 BuildRequires:	python3dist(wheel)
 
 BuildArch:	noarch
@@ -37,7 +38,7 @@ native libraries of your chosen backend.
 #----------------------------------------------------------------------------
 
 %prep
-%autosetup -n %{module}-%{version}
+%autosetup -n %{module}-%{version} -p1
 
 %build
 %py_build
