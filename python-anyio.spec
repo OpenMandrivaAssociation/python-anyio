@@ -3,7 +3,7 @@
 Summary:	High level compatibility layer for multiple asynchronous event loop implementations
 Name:		python-%{module}
 Version:	3.5.0
-Release:	1
+Release:	2
 License:	MIT
 Group:		Development/Python
 Url:		https://github.com/agronholm/%{module}
