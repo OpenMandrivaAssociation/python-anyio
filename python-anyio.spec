@@ -2,20 +2,20 @@
 
 Summary:	High level compatibility layer for multiple asynchronous event loop implementations
 Name:		python-%{module}
-Version:	3.5.0
-Release:	2
+Version:	3.7.1
+Release:	1
 License:	MIT
 Group:		Development/Python
 Url:		https://github.com/agronholm/%{module}
 Source:		https://files.pythonhosted.org/packages/source/a/%{module}/%{module}-%{version}.tar.gz
 
 BuildRequires:	pkgconfig(python3)
-BuildRequires:	python3dist(pip)
-BuildRequires:	python3dist(pytest)
-BuildRequires:	python3dist(setuptools)
-BuildRequires:	python3dist(setuptools-scm)
-BuildRequires:  python3dist(tomli)
-BuildRequires:	python3dist(wheel)
+BuildRequires:	python-pip
+BuildRequires:	python-pytest
+BuildRequires:	python-setuptools
+BuildRequires:	python-setuptools_scm
+BuildRequires:	python-tomli
+BuildRequires:	python-wheel
 
 BuildArch:	noarch
 
@@ -29,14 +29,6 @@ either asyncio or trio. AnyIO can also be adopted into a library or application
 incrementally – bit by bit, no full refactoring necessary. It will blend in with
 native libraries of your chosen backend.
 
-%files
-%license LICENSE
-%doc README.rst
-%{python_sitelib}/%{module}/
-%{python_sitelib}/%{module}-%{version}-py%{pyver}.egg-info/
-
-#----------------------------------------------------------------------------
-
 %prep
 %autosetup -n %{module}-%{version} -p1
 
@@ -46,3 +38,13 @@ native libraries of your chosen backend.
 %install
 %py_install
 
+
+%files
+%license LICENSE
+%doc README.rst
+%{python3_sitelib}/%{module}-%{version}.dist-info
+%{python3_sitelib}/%{module}/*.py
+%{python3_sitelib}/%{module}/*.typed
+%{python3_sitelib}/%{module}/__pycache__/*.cpython-3*.pyc
+%{python3_sitelib}/%{module}/*/*.py
+%{python3_sitelib}/%{module}/*/__pycache__/*.cpython-3*.pyc
