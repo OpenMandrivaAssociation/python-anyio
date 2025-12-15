@@ -1,16 +1,17 @@
 %define module anyio
-%bcond_with test
+# disabled tests for python upgrade
+%bcond tests 0
 
 Summary:	High level compatibility layer for multiple asynchronous event loop implementations
-Name:		python-%{module}
-Version:	3.7.1
-Release:	3
+Name:		python-anyio
+Version:	4.12.0
+Release:	1
 License:	MIT
 Group:		Development/Python
-Url:		https://github.com/agronholm/%{module}
+Url:		https://github.com/agronholm/anyio
 Source:		https://files.pythonhosted.org/packages/source/a/%{module}/%{module}-%{version}.tar.gz
 # to fix tests
-Patch0:		anyio-3.7.1-fix-test-symlink.patch
+#Patch0:		anyio-3.7.1-fix-test-symlink.patch
 
 BuildRequires:	pkgconfig(python3)
 BuildRequires:	python%{pyver}dist(pip)
@@ -23,6 +24,7 @@ BuildRequires:	python%{pyver}dist(wheel)
 BuildRequires:	python%{pyver}dist(trio)
 
 # for tests
+%if %{with tests}
 BuildRequires:	python%{pyver}dist(pytest)
 BuildRequires:	python%{pyver}dist(coverage)
 BuildRequires:	python%{pyver}dist(cython)
@@ -32,10 +34,10 @@ BuildRequires:	python%{pyver}dist(pytest-mock)
 BuildRequires:	python%{pyver}dist(sniffio)
 BuildRequires:	python%{pyver}dist(trustme)
 BuildRequires:	python%{pyver}dist(uvloop)
-
+%endif
 
 BuildArch:	noarch
-Provides:	python%{pyver}dist(%{module})
+Provides:	python%{pyver}dist(%{module}) = %{version}-%{release}
 
 %description
 AnyIO is an asynchronous networking and concurrency library that works on top
@@ -49,6 +51,8 @@ native libraries of your chosen backend.
 
 %prep
 %autosetup -n %{module}-%{version} -p1
+# Remove upstream's egg-info
+rm -vrf src/%{module}.egg-info
 # disable coverage test requirement
 sed -e '/"coverage/d' -i pyproject.toml
 
@@ -58,7 +62,7 @@ sed -e '/"coverage/d' -i pyproject.toml
 %install
 %py_install
 
-%if %{with test}
+%if %{with tests}
 %check
 # we dont have network access to run these tests
 ignore="${ignore-} --ignore=tests/test_sockets.py --ignore=tests/streams/test_tls.py"
@@ -69,9 +73,9 @@ ignore="${ignore-} --ignore=tests/test_sockets.py --ignore=tests/streams/test_tl
 %files
 %license LICENSE
 %doc README.rst
-%{python3_sitelib}/%{module}-%{version}.dist-info
-%{python3_sitelib}/%{module}/*.py
-%{python3_sitelib}/%{module}/*.typed
-%{python3_sitelib}/%{module}/__pycache__/*.cpython-3*.pyc
-%{python3_sitelib}/%{module}/*/*.py
-%{python3_sitelib}/%{module}/*/__pycache__/*.cpython-3*.pyc
+%{python_sitelib}/%{module}-%{version}.dist-info
+%{python_sitelib}/%{module}/*.py
+%{python_sitelib}/%{module}/*.typed
+%{python_sitelib}/%{module}/__pycache__/*.cpython-3*.pyc
+%{python_sitelib}/%{module}/*/*.py
+%{python_sitelib}/%{module}/*/__pycache__/*.cpython-3*.pyc
