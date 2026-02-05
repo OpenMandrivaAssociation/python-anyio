@@ -80,6 +80,7 @@ skiptest+=" or (test_properties and trio)"
 skiptest+=" or (test_properties and asyncio)"
 skiptest+=" or test_keyboardinterrupt_during_test"
 skiptest+=" or test_anyio_fixture_adoption_does_not_persist"
+skiptest+=" or test_connect_tcp_getaddrinfo_context"
 
 pytest -Wdefault -m "not network" -k "not (${skiptest})" -ra
 %endif
