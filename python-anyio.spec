@@ -1,18 +1,17 @@
 %define module anyio
-# disabled tests for python upgrade
-%bcond tests 0
+# enable tests
+%bcond tests 1
 
-Summary:	High level compatibility layer for multiple asynchronous event loop implementations
 Name:		python-anyio
-Version:	4.12.0
+Version:	4.12.1
 Release:	1
+Summary:	Asynchronous concurrency & networking framework
 License:	MIT
 Group:		Development/Python
-Url:		https://github.com/agronholm/anyio
-Source:		https://files.pythonhosted.org/packages/source/a/%{module}/%{module}-%{version}.tar.gz
-# to fix tests
-#Patch0:		anyio-3.7.1-fix-test-symlink.patch
-
+URL:		https://github.com/agronholm/anyio
+Source:		https://github.com/agronholm/anyio/archive/%{version}/%{name}-%{version}.tar.gz
+BuildSystem:	python
+BuildArch:	noarch
 BuildRequires:	pkgconfig(python3)
 BuildRequires:	python%{pyver}dist(pip)
 BuildRequires:	python%{pyver}dist(psutil)
@@ -22,21 +21,20 @@ BuildRequires:	python%{pyver}dist(setuptools-scm)
 BuildRequires:	python%{pyver}dist(toml)
 BuildRequires:	python%{pyver}dist(wheel)
 BuildRequires:	python%{pyver}dist(trio)
-
 # for tests
 %if %{with tests}
-BuildRequires:	python%{pyver}dist(pytest)
-BuildRequires:	python%{pyver}dist(coverage)
 BuildRequires:	python%{pyver}dist(cython)
+BuildRequires:	python%{pyver}dist(exceptiongroup)
 BuildRequires:	python%{pyver}dist(hypothesis)
 BuildRequires:	python%{pyver}dist(pluggy)
+BuildRequires:	python%{pyver}dist(psutil)
+BuildRequires:	python%{pyver}dist(pytest)
 BuildRequires:	python%{pyver}dist(pytest-mock)
 BuildRequires:	python%{pyver}dist(sniffio)
 BuildRequires:	python%{pyver}dist(trustme)
 BuildRequires:	python%{pyver}dist(uvloop)
 %endif
 
-BuildArch:	noarch
 Provides:	python%{pyver}dist(%{module}) = %{version}-%{release}
 
 %description
@@ -49,25 +47,41 @@ either asyncio or trio. AnyIO can also be adopted into a library or application
 incrementally – bit by bit, no full refactoring necessary. It will blend in with
 native libraries of your chosen backend.
 
-%prep
-%autosetup -n %{module}-%{version} -p1
+%prep -a
 # Remove upstream's egg-info
 rm -vrf src/%{module}.egg-info
 # disable coverage test requirement
-sed -e '/"coverage/d' -i pyproject.toml
+sed -i '/"blockbuster/d' pyproject.toml
+sed -i '/"coverage/d' pyproject.toml
+sed -i '/"truststore/d' pyproject.toml
+sed -i '/"uvloop/d' pyproject.toml
 
-%build
-%py_build
-
-%install
-%py_install
+%build -p
+# package cannot figure out its own version, use scm override to provide it
+export SETUPTOOLS_SCM_PRETEND_VERSION=%{version}
 
 %if %{with tests}
 %check
+export CI=true
+export PYTHONPATH="%{buildroot}%{python_sitelib}:${PWD}"
 # we dont have network access to run these tests
-ignore="${ignore-} --ignore=tests/test_sockets.py --ignore=tests/streams/test_tls.py"
+# some of these are also flaky
+skiptest+="(TestTCPStream and test_happy_eyeballs)"
+skiptest+=" or (TestTCPStream and test_connection_refused)"
+skiptest+=" or test_bind_link_local"
+skiptest+=" or (TestTCPStream and (ipv4 or ipv6))"
+skiptest+=" or (TestTCPListener and (ipv4 or ipv6))"
+skiptest+=" or (TestConnectedUDPSocket and (ipv4 or ipv6))"
+skiptest+=" or (TestUDPSocket and (ipv4 or ipv6))"
+skiptest+=" or (TestTLSStream and test_ragged_eofs)"
+skiptest+=" or (test_send_eof_not_implemented)"
+skiptest+=" or (test_exception_group and trio)"
+skiptest+=" or (test_properties and trio)"
+skiptest+=" or (test_properties and asyncio)"
+skiptest+=" or test_keyboardinterrupt_during_test"
+skiptest+=" or test_anyio_fixture_adoption_does_not_persist"
 
-%{__python} -m pytest -v -Wdefault -m "not network" ${ignore-} -k "not ((trio and exception_group) or test_properties) and not test_autouse_async_fixture and not test_cancel_scope_in_asyncgen_fixture and not test_module_scoped_task_group_fixture"
+pytest -Wdefault -m "not network" -k "not (${skiptest})" -ra
 %endif
 
 %files
