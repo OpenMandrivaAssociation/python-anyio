@@ -3,7 +3,7 @@
 %bcond tests 1
 
 Name:		python-anyio
-Version:	4.12.1
+Version:	4.13.0
 Release:	1
 Summary:	Asynchronous concurrency & networking framework
 License:	MIT
