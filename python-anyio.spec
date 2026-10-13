@@ -58,6 +58,9 @@ sed -i '/"uvloop/d' pyproject.toml
 # pytest-timeout is not packaged. --strict-config rejects the timeout option without the plugin.
 sed -i '/"-p", "timeout",/d' pyproject.toml
 sed -i '/^[[:space:]]*timeout = "20"/d' pyproject.toml
+# Python 3.15 rejects server_hostname on a server-side SSLObject.
+sed -i 's/server_hostname=server_hostname,/server_hostname=None if server_side else server_hostname,/' src/anyio/streams/tls.py
+sed -i 's/^[[:space:]]*server_hostname,$/                server_hostname if not server_side else None,/' src/anyio/streams/tls.py
 
 %build -p
 # package cannot figure out its own version, use scm override to provide it
@@ -84,6 +87,9 @@ skiptest+=" or (test_properties and asyncio)"
 skiptest+=" or test_keyboardinterrupt_during_test"
 skiptest+=" or test_anyio_fixture_adoption_does_not_persist"
 skiptest+=" or test_connect_tcp_getaddrinfo_context"
+# Subprocess pytest budgets of 3s and 5s expire on aarch64.
+skiptest+=" or test_keyboard_interrupt_does_not_resume_test"
+skiptest+=" or test_dynamic_async_fixture_access_does_not_hang"
 
 pytest -Wdefault -m "not network" -k "not (${skiptest})" -ra
 %endif
