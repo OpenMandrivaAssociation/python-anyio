@@ -90,6 +90,8 @@ skiptest+=" or test_connect_tcp_getaddrinfo_context"
 # Subprocess pytest budgets of 3s and 5s expire on aarch64.
 skiptest+=" or test_keyboard_interrupt_does_not_resume_test"
 skiptest+=" or test_dynamic_async_fixture_access_does_not_hang"
+# aarch64 saw an unrelated thread exit during this count (5 vs 6).
+skiptest+=" or test_single_thread"
 
 pytest -Wdefault -m "not network" -k "not (${skiptest})" -ra
 %endif
