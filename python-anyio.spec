@@ -55,6 +55,9 @@ sed -i '/"blockbuster/d' pyproject.toml
 sed -i '/"coverage/d' pyproject.toml
 sed -i '/"truststore/d' pyproject.toml
 sed -i '/"uvloop/d' pyproject.toml
+# pytest-timeout is not packaged. --strict-config rejects the timeout option without the plugin.
+sed -i '/"-p", "timeout",/d' pyproject.toml
+sed -i '/^[[:space:]]*timeout = "20"/d' pyproject.toml
 
 %build -p
 # package cannot figure out its own version, use scm override to provide it
